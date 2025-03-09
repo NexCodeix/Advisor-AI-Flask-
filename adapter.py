@@ -111,3 +111,16 @@ class StabilityAIAdapter(object):
         print("Sleeping for 3 Seconds")
         url = f"{prompt}--{i}"
         return url 
+
+
+
+"""
+{ 
+    "event": "generate-ai-images", 
+    "data": {
+        "prompt": "Make it look more aesthetic",
+        "image": "https://www.lumierebeautyclinic.com.au/wp-content/uploads/2023/05/how-to-make-yourself-pretty-Lumiere-Beauty-Clinic-scaled.jpg"
+    } 
+}
+
+"""
