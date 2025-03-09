@@ -1,0 +1,40 @@
+sudo mkfs.ext4 /dev/nvme1n1
+sudo mkdir -p /mnt/home_new
+sudo mount /dev/nvme1n1 /mnt/home_new
+sudo rsync -av /home/ubuntu/ /mnt/home_new/
+sudo blkid
+
+sudo nano /etc/fstab
+    UUID=df736466-1cb3-45c7-be02-f43a1966c043  /home/ubuntu   ext4    defaults,nofail  0 2
+
+sudo umount /home/ubuntu
+sudo mount -a
+df -h
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y build-essential dkms
+
+lsmod | grep nouveau
+echo "options nouveau modeset=0" | sudo tee -a /etc/modprobe.d/blacklist-nouveau.conf
+sudo update-initramfs -u
+
+sudo apt install -y nvidia-driver-535
+
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-repo-ubuntu2204_12.3.0-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2204_12.3.0-1_amd64.deb
+sudo apt update
+sudo apt install -y cuda
+
+echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+
+sudo apt install -y nvidia-fabricmanager-535
+sudo systemctl enable nvidia-fabricmanager
+sudo systemctl start nvidia-fabricmanager
+
+lsmod | grep nvidia
+sudo modprobe nvidia
+
+python3 -c "import torch; print(torch.cuda.is_available())"
+
