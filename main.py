@@ -11,6 +11,8 @@ socketio = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*", transp
 adapter = StabilityAIAdapter()
 adapter.enable_memory_efficiency()
 
+connected_users_sid_data = {}
+
 @app.route("/")
 def hello():
     return render_template("index.html")
@@ -49,8 +51,19 @@ def handle_connect():
     emit("server", data, room=sid)
 
 
+@socketio.on("register")
+def handle_register(data):
+    data = json.loads(data)
+    print("DATA --> ", data)
+    user_id = data.get("user_id")
+    sid = request.sid
+    connected_users_sid_data[sid] = user_id
+
+
 @socketio.on("message")
 def handle_message(data):
+    print("DATA --> ", data)
+
     data = json.loads(data)
     print("DATA --> ", data)
     
@@ -79,6 +92,7 @@ def handle_message(data):
                 "sid": request.sid,
                 "url": url,
             }
+            data["for_user_id"] = connected_users_sid_data[request.sid]
             lst.append(url)
             emit('server', data, room=request.sid)
             socketio.sleep(0)
@@ -87,10 +101,9 @@ def handle_message(data):
             "command": "data send success",
             "sid": request.sid,
         }
+        data["for_user_id"] = connected_users_sid_data[request.sid]
         emit('server', data, room=request.sid)
         socketio.sleep(0)
-
-
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -121,4 +134,4 @@ def checkping():
 
 
 if __name__ == '__main__':
-   socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+   socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
