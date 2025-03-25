@@ -1,3 +1,4 @@
+import os
 import boto3
 import torch
 import requests
@@ -7,11 +8,11 @@ from PIL import Image
 
 model_id = "stabilityai/stable-diffusion-xl-base-1.0"
 
-AWS_STORAGE_BUCKET_NAME = "advisor-bucket"
-AWS_ACCESS_KEY_ID = "AKIA47GCABVWGQ5KDECT"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_S3_REGION_NAME = "eu-north-1"
-AWS_S3_ENDPOINT_URL = "https://advisor-bucket.s3.eu-north-1.amazonaws.com"
+AWS_STORAGE_BUCKET_NAME=os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_ACCESS_KEY_ID=os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY=os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_S3_REGION_NAME=os.environ.get("AWS_S3_REGION_NAME")
+AWS_S3_ENDPOINT_URL=os.environ.get("AWS_S3_ENDPOINT_URL")
 
 s3_client = boto3.client(
     "s3",
