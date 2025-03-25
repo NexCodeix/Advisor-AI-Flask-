@@ -131,7 +131,7 @@ class StabilityAIAdapter(object):
     def create_ai_image(self, prompt, image, i):
         output_image = self.pipe(
             prompt=prompt, 
-            image=image, 
+            # image=image, 
             strength=self.strength, 
             num_inference_steps=40  # Higher steps for better quality
         ).images[0]
