@@ -62,6 +62,7 @@ def handle_register(data):
     sid = request.sid
     connected_user[user_id] = request.sid
     connected_users_sid_data[sid] = user_id
+    print("User has been registered")
     emit("server", {"message": "registered"}, room=sid)
 
 
@@ -113,7 +114,12 @@ def handle_message(data):
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print("❌ Client disconnected")
+    
+    for i, j in connected_user.items():
+        if j == request.sid:
+            print("❌ Client disconnected User ID: ", i)
+            socketio.emit("user_disconnected", {"user_id": i})
+            break
 
 
 
