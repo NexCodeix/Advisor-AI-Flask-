@@ -62,7 +62,7 @@ class StabilityAIAdapter(object):
         output_image.save(image_bytes, format=image_format)
         image_bytes.seek(0)  # Reset stream position
 
-        path_name = "media/post-images/Post-106"
+        path_name = "ai/repost"
         file_name = f"{name}-{secrets.token_hex(8)}"
         s3_client.put_object(
             Bucket=AWS_STORAGE_BUCKET_NAME,
