@@ -63,7 +63,7 @@ class StabilityAIAdapter(object):
         image_bytes.seek(0)  # Reset stream position
 
         path_name = "ai/repost/"
-        file_name = f"{secrets.token_hex(8)}"
+        file_name = f"{name}-{secrets.token_hex(8)}"
         s3_client.put_object(
             Bucket=AWS_STORAGE_BUCKET_NAME,
             Key=f"{path_name}/{name}",  # Path where the file will be stored
