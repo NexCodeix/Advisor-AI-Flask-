@@ -1,9 +1,9 @@
 import time
-# import torch
+import torch
 import requests
 from io import BytesIO
 from PIL import Image
-# from diffusers import StableDiffusionXLImg2ImgPipeline
+from diffusers import StableDiffusionXLImg2ImgPipeline
 
 
 class StabilityAIAdapter(object):
@@ -11,22 +11,22 @@ class StabilityAIAdapter(object):
     emit = None
     sid = None
 
-    # def __init__(self):
-        # model_id = "stabilityai/stable-diffusion-xl-base-1.0"
-        # pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
-        #     model_id, 
-        #     torch_dtype=torch.float16,  # Reduces memory usage
-        #     low_cpu_mem_usage=True  # Optimizes RAM
-        # )
+    def __init__(self):
+        model_id = "stabilityai/stable-diffusion-xl-base-1.0"
+        pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+            model_id, 
+            torch_dtype=torch.float16,  # Reduces memory usage
+            low_cpu_mem_usage=True  # Optimizes RAM
+        )
 
-        # # Move the model to GPU
-        # pipe.to("cuda")
-        # self.pipe = pipe
+        # Move the model to GPU
+        pipe.to("cuda")
+        self.pipe = pipe
 
     def enable_memory_efficiency(self):
         # Enable memory optimizations
-        # self.pipe.enable_xformers_memory_efficient_attention()  # Faster inference, less memory
-        # self.pipe.enable_attention_slicing()  # Reduce VRAM spikes
+        self.pipe.enable_xformers_memory_efficient_attention()  # Faster inference, less memory
+        self.pipe.enable_attention_slicing()  # Reduce VRAM spikes
         print("Fastening Memory Efficiency")
 
     def add_image(self, image_url=None):
