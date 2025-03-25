@@ -13,6 +13,8 @@ adapter.enable_memory_efficiency()
 
 connected_users_sid_data = {}
 
+connected_user = {}
+
 @app.route("/")
 def hello():
     return render_template("index.html")
@@ -58,9 +60,9 @@ def handle_register(data):
     user_id = data.get("user_id")
     room = f"room_{user_id}"
     sid = request.sid
+    connected_user[user_id] = request.sid
     connected_users_sid_data[sid] = user_id
-    join_room(room)
-    emit("register", {"message": "registered"}, room=room)
+    emit("server", {"message": "registered"}, room=sid)
 
 
 @socketio.on("message")
@@ -73,6 +75,7 @@ def handle_message(data):
     event = data.get("event")
     ai_data = data.get("data")
     prompt = ai_data.get("prompt")
+    user_id = data.get("user_id")
     image_url = ai_data.get("image_url")
 
     if event == "generate-ai-images":
@@ -95,9 +98,9 @@ def handle_message(data):
                 "sid": request.sid,
                 "url": url,
             }
-            data["for_user_id"] = connected_users_sid_data[request.sid]
+            data["for_user_id"] = user_id
             lst.append(url)
-            emit('server', data, room=request.sid)
+            emit('server', data, room=connected_user[user_id])
             socketio.sleep(0)
 
         data = {
@@ -105,7 +108,7 @@ def handle_message(data):
             "sid": request.sid,
         }
         data["for_user_id"] = connected_users_sid_data[request.sid]
-        emit('server', data, room=request.sid)
+        emit('server', data, room=connected_user[user_id])
         socketio.sleep(0)
 
 @socketio.on('disconnect')
