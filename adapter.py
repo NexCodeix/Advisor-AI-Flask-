@@ -7,6 +7,9 @@ import requests
 from io import BytesIO
 from PIL import Image
 from diffusers import StableDiffusionXLImg2ImgPipeline
+from dotenv import load_dotenv
+
+load_dotenv()
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
