@@ -1,10 +1,25 @@
+import os
+import secrets
 import time
+import boto3
 import torch
 import requests
 from io import BytesIO
 from PIL import Image
 from diffusers import StableDiffusionXLImg2ImgPipeline
 
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME")
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL= os.environ.get("AWS_S3_ENDPOINT_URL")
+
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    region_name=AWS_S3_REGION_NAME   
+)
 
 class StabilityAIAdapter(object):
     strength = 0.75  # How much the model modifies the image
@@ -39,7 +54,16 @@ class StabilityAIAdapter(object):
         return init_image
     
     def upload_to_s3(self, output_image, name):
-        return output_image.save(name)
+        path_name = "ai/repost/"
+        file_name = f"{secrets.token_hex(8)}"
+        s3_client.put_object(
+            Bucket=AWS_STORAGE_BUCKET_NAME,
+            Key=f"{path_name}/{name}",  # Path where the file will be stored
+            Body=output_image,  # The file content
+            ContentType=output_image.content_type  # Set correct content type
+        )
+        url = f"{AWS_S3_ENDPOINT_URL}/{path_name}/{file_name}"
+        return url
     
     def emit_to_websocket(self, url):
         if not self.sid:
@@ -105,11 +129,8 @@ class StabilityAIAdapter(object):
         ).images[0]
     
         print(f"Saving {i}")
-        # url = self.upload_to_s3(output_image, f"output_{i+1}.png")
-        # return url
-        breakpoint()
-        print("Sleeping for 3 Seconds")
-        url = f"{prompt}--{i}"
+        url = self.upload_to_s3(output_image, f"output_{i+1}.png")
+        print("URL --> ", url)
         return url 
 
 
