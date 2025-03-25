@@ -6,7 +6,7 @@ import torch
 import requests
 from io import BytesIO
 from PIL import Image
-from diffusers import StableDiffusionXLImg2ImgPipeline
+from diffusers import StableDiffusionXLImg2ImgPipeline, DiffusionPipeline
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,10 +31,12 @@ class StabilityAIAdapter(object):
 
     def __init__(self):
         model_id = "stabilityai/stable-diffusion-xl-base-1.0"
-        pipe = StableDiffusionXLImg2ImgPipeline.from_pretrained(
+        pipe = DiffusionPipeline.from_pretrained(
             model_id, 
             torch_dtype=torch.float16,  # Reduces memory usage
-            low_cpu_mem_usage=True  # Optimizes RAM
+            # low_cpu_mem_usage=True,  # Optimizes RAM
+            variant="fp16", 
+            use_safetensors=True,
         )
 
         # Move the model to GPU
