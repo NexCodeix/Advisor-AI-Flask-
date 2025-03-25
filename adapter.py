@@ -67,10 +67,10 @@ class StabilityAIAdapter(object):
         lst = []
         prompt_variations = [
             f"{prompt}, ultra-detailed, cinematic lighting",
-            f"{prompt}, surreal and dreamy, artistic brush strokes",
-            f"{prompt}, futuristic and hyper-realistic, 8K resolution",
-            f"{prompt}, in the style of a Renaissance painting",
-            f"{prompt}, vibrant cyberpunk aesthetic, neon reflections"
+            # f"{prompt}, surreal and dreamy, artistic brush strokes",
+            # f"{prompt}, futuristic and hyper-realistic, 8K resolution",
+            # f"{prompt}, in the style of a Renaissance painting",
+            # f"{prompt}, vibrant cyberpunk aesthetic, neon reflections"
         ]
 
         for i, prompt in enumerate(prompt_variations):
@@ -97,17 +97,17 @@ class StabilityAIAdapter(object):
         return "Done"
 
     def create_ai_image(self, prompt, image, i):
-        # output_image = self.pipe(
-        #     prompt=prompt, 
-        #     image=image, 
-        #     strength=self.strength, 
-        #     num_inference_steps=40  # Higher steps for better quality
-        # ).images[0]
+        output_image = self.pipe(
+            prompt=prompt, 
+            image=image, 
+            strength=self.strength, 
+            num_inference_steps=40  # Higher steps for better quality
+        ).images[0]
     
-        # print(f"Saving {i}")
+        print(f"Saving {i}")
         # url = self.upload_to_s3(output_image, f"output_{i+1}.png")
         # return url
-        self.slow_function()
+        breakpoint()
         print("Sleeping for 3 Seconds")
         url = f"{prompt}--{i}"
         return url 
