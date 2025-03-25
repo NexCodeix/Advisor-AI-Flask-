@@ -54,13 +54,18 @@ class StabilityAIAdapter(object):
         return init_image
     
     def upload_to_s3(self, output_image, name):
+        image_bytes = BytesIO()
+        image_format = "JPEG"  # Change format if needed (e.g., PNG, JPEG)
+        output_image.save(image_bytes, format=image_format)
+        image_bytes.seek(0)  # Reset stream position
+
         path_name = "ai/repost/"
         file_name = f"{secrets.token_hex(8)}"
         s3_client.put_object(
             Bucket=AWS_STORAGE_BUCKET_NAME,
             Key=f"{path_name}/{name}",  # Path where the file will be stored
-            Body=output_image,  # The file content
-            ContentType=output_image.content_type  # Set correct content type
+            Body=image_bytes,  # The file content
+            ContentType=f"image/{image_format.lower()}"  # Set correct content type
         )
         url = f"{AWS_S3_ENDPOINT_URL}/{path_name}/{file_name}"
         return url
@@ -129,7 +134,7 @@ class StabilityAIAdapter(object):
         ).images[0]
     
         print(f"Saving {i}")
-        url = self.upload_to_s3(output_image, f"output_{i+1}.png")
+        url = self.upload_to_s3(output_image, f"output_{i+1}.jpeg")
         print("URL --> ", url)
         return url 
 
