@@ -129,6 +129,7 @@ class StabilityAIAdapter(object):
         return "Done"
 
     def create_ai_image(self, prompt, image, i):
+        print("Creating AI Image \n\n")
         output_image = self.pipe(
             prompt=prompt, 
             # image=image, 
