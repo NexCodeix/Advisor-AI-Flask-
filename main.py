@@ -1,6 +1,6 @@
 import json
 from flask import Flask, render_template, jsonify, request
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from utils import fetch_and_verify_image, generate_image
 from adapter import StabilityAIAdapter
 import subprocess
@@ -56,8 +56,11 @@ def handle_register(data):
     data = json.loads(data)
     print("DATA --> ", data)
     user_id = data.get("user_id")
+    room = f"room_{user_id}"
     sid = request.sid
     connected_users_sid_data[sid] = user_id
+    join_room(room)
+    emit("register", {"message": "registered"}, room=room)
 
 
 @socketio.on("message")
