@@ -66,7 +66,7 @@ class StabilityAIAdapter(object):
         file_name = f"{name}-{secrets.token_hex(8)}"
         s3_client.put_object(
             Bucket=AWS_STORAGE_BUCKET_NAME,
-            Key=f"{path_name}/{name}",  # Path where the file will be stored
+            Key=f"{path_name}/{file_name}",  # Path where the file will be stored
             Body=image_bytes,  # The file content
             ContentType=f"image/{image_format.lower()}"  # Set correct content type
         )
