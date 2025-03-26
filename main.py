@@ -15,7 +15,6 @@ connected_users = {}
 
 connected_users_sid_data = {}
 
-connected_user = {}
 
 @app.route("/")
 def hello():
@@ -53,7 +52,6 @@ def handle_connect():
 @socketio.on("register")
 def handle_register(data):
     data = json.loads(data)
-    print("DATA --> ", data)
     user_id = data.get("user_id")
     room = f"room_{user_id}"
     connected_users[request.sid] = user_id
@@ -64,8 +62,6 @@ def handle_register(data):
 
 @socketio.on("message")
 def handle_message(data):
-    print("DATA --> ", data)
-
     data = json.loads(data)
     print("DATA --> ", data)
     
@@ -97,7 +93,7 @@ def handle_message(data):
             }
             data["for_user_id"] = user_id
             lst.append(url)
-            emit('server', data, room=connected_user[user_id])
+            emit('server', data, room=connected_users[user_id])
             socketio.sleep(0)
 
         data = {
@@ -105,15 +101,17 @@ def handle_message(data):
             "sid": request.sid,
         }
         data["for_user_id"] = connected_users_sid_data[request.sid]
-        emit('server', data, room=connected_user[user_id])
+        emit('server', data, room=connected_users[user_id])
         socketio.sleep(0)
+
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    for i, j in connected_user.items():
-        if j == request.sid:
-            print("❌ Client disconnected User ID: ", i)
-            socketio.emit("user_disconnected", {"user_id": i})
+    for i, j in connected_users.items():
+        if i == request.sid:
+            print("❌ Client disconnected User ID: ", j)
+            room = f"room_{j}"
+            socketio.emit("user_disconnected", {"user_id": i}, room=room)
             break
 
 
