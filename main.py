@@ -70,7 +70,7 @@ def handle_message(data):
     prompt = ai_data.get("prompt")
     user_id = data.get("user_id")
     image_url = ai_data.get("image_url")
-
+    room = f"room_{user_id}"
     if event == "generate-ai-images":
         print("Generating AI Images")
 
@@ -93,15 +93,15 @@ def handle_message(data):
             }
             data["for_user_id"] = user_id
             lst.append(url)
-            emit('server', data, room=connected_users[user_id])
+            emit('server', data, room=room)
             socketio.sleep(0)
 
         data = {
             "command": "data send success",
             "sid": request.sid,
         }
-        data["for_user_id"] = connected_users_sid_data[request.sid]
-        emit('server', data, room=connected_users[user_id])
+        data["for_user_id"] = user_id
+        emit('server', data, room=room)
         socketio.sleep(0)
 
 
