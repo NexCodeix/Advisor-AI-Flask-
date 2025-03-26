@@ -11,6 +11,8 @@ socketio = SocketIO(app, async_mode="eventlet", cors_allowed_origins="*", transp
 adapter = StabilityAIAdapter()
 adapter.enable_memory_efficiency()
 
+connected_users = {}
+
 connected_users_sid_data = {}
 
 connected_user = {}
@@ -46,11 +48,6 @@ def handle_connect():
     print("✅ Client connected")
     sid = request.sid
     print(f"✅ Client connected: {sid}")
-    data = {
-        "message": "Connected!",
-        "sid": sid,
-    }
-    emit("server", data, room=sid)
 
 
 @socketio.on("register")
@@ -59,11 +56,10 @@ def handle_register(data):
     print("DATA --> ", data)
     user_id = data.get("user_id")
     room = f"room_{user_id}"
-    sid = request.sid
-    connected_user[user_id] = request.sid
-    connected_users_sid_data[sid] = user_id
-    print("User has been registered")
-    emit("server", {"message": "registered"}, room=sid)
+    connected_users[request.sid] = user_id
+    join_room(room)
+    print(f"👤 User {user_id} joined room {room}")
+    emit("server", {"message": "registered", "user_id": user_id}, room=room)
 
 
 @socketio.on("message")
@@ -114,7 +110,6 @@ def handle_message(data):
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    
     for i, j in connected_user.items():
         if j == request.sid:
             print("❌ Client disconnected User ID: ", i)
