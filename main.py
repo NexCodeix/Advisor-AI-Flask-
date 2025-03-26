@@ -57,7 +57,7 @@ def handle_register(data):
     connected_users[request.sid] = user_id
     join_room(room)
     print(f"👤 User {user_id} joined room {room}")
-    emit("server", {"message": "registered", "user_id": user_id}, room=room)
+    emit("server", {"message": "registered", "user_id": user_id, "command": "ping"}, room=room)
 
 
 @socketio.on("message")
