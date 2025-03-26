@@ -5,7 +5,7 @@ sudo rsync -av /home/ubuntu/ /mnt/home_new/
 sudo blkid
 
 sudo nano /etc/fstab
-    UUID=df736466-1cb3-45c7-be02-f43a1966c043  /home/ubuntu   ext4    defaults,nofail  0 2
+    UUID=33ba33d0-7c48-43a0-b445-d7d5c3c198e8  /home/ubuntu   ext4    defaults,nofail  0 2
 
 sudo umount /home/ubuntu
 sudo mount -a

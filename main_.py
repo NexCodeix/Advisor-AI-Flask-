@@ -72,38 +72,8 @@ def handle_message(data):
     image_url = ai_data.get("image_url")
     room = f"room_{user_id}"
     if event == "generate-ai-images":
-        print("Generating AI Images")
-
-        init_image = adapter.add_image(image_url)
-        lst = []
-        prompt_variations = [
-            f"{prompt}, ultra-detailed, cinematic lighting",
-            f"{prompt}, surreal and dreamy, artistic brush strokes",
-            f"{prompt}, futuristic and hyper-realistic, 8K resolution",
-            f"{prompt}, in the style of a Renaissance painting",
-            f"{prompt}, vibrant cyberpunk aesthetic, neon reflections"
-        ]
-
-        for i, prompt in enumerate(prompt_variations):
-            url = adapter.create_ai_image(prompt, init_image, i)
-            data = {
-                "command": "asynchonous data sending",
-                "sid": request.sid,
-                "url": url,
-            }
-            data["for_user_id"] = user_id
-            lst.append(url)
-            emit('server', data, room=room)
-            socketio.sleep(0)
-
-        data = {
-            "command": "data send success",
-            "sid": request.sid,
-        }
-        data["for_user_id"] = user_id
-        emit('server', data, room=room)
-        socketio.sleep(0)
-
+        start_background_task(generate_image_in_background, data, prompt, image_url, room, user_id, request.sid)
+        print("Completed Background tasking")
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -117,9 +87,15 @@ def handle_disconnect():
 
 
 @socketio.on("ping")
-def handle_ping():
+def handle_ping(data):
     """Responds to keep-alive pings"""
-    user_id = connected_users[request.sid]
+    print("Data Received from Django", data)
+    try:
+        user_id = connected_users[request.sid]
+    except KeyError as e:
+        print(e)
+        return None
+
     room = f"room_{user_id}"
     print(f"🔄 Received ping from {user_id}")
     emit("pong", {"message": "Pong!"}, room=room)  # Reply with "pong"
@@ -135,6 +111,47 @@ def checkping():
         emit('server', {"data1":x, "data":listing1.stdout}, room=sid)
         socketio.sleep(1)
 
+
+def start_background_task(func, *args):
+    socketio.start_background_task(func, *args)
+    print("Started background tasking")
+
+
+def generate_image_in_background(data, prompt, image_url, room, user_id, sid):
+    init_image = adapter.add_image(image_url)
+    lst = []
+    prompt_variations = [
+        f"{prompt}, ultra-detailed, cinematic lighting",
+        f"{prompt}, surreal and dreamy, artistic brush strokes",
+        f"{prompt}, futuristic and hyper-realistic, 8K resolution",
+        f"{prompt}, in the style of a Renaissance painting",
+        f"{prompt}, vibrant cyberpunk aesthetic, neon reflections",
+        "",
+        "",
+        "",
+    ]
+
+    for i, prompt in enumerate(prompt_variations):
+        url = adapter.create_ai_image(prompt, init_image, user_id)
+        print(f"Generated AI Images for {user_id}")
+        data = {
+            "command": "asynchonous data sending",
+            "sid": sid,
+            "url": url,
+        }
+        data["for_user_id"] = user_id
+        lst.append(url)
+        socketio.emit('server', data, room=room)
+        socketio.sleep(0)
+        print("Emmitting to room: ", room)
+
+    data = {
+        "command": "data send success",
+        "sid": sid,
+    }
+    data["for_user_id"] = user_id
+    socketio.emit('server', data, room=room)
+    socketio.sleep(0)
 
 # @socketio.on('start_generation')
 # def handle_image_generation(data):

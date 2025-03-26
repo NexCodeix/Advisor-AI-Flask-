@@ -7,9 +7,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 # from diffusers import StableDiffusionXLImg2ImgPipeline, DiffusionPipeline
-from dotenv import load_dotenv
-
-load_dotenv()
+from asgiref.sync import sync_to_async
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
@@ -128,6 +126,14 @@ class StabilityAIAdapter(object):
         print("URL --> ", url)
         return url 
 
+
+adapter = StabilityAIAdapter()
+
+
+@sync_to_async
+def create_ai_image(prompt, image, i):
+    url = adapter.create_ai_image(prompt, image, i)
+    return url
 
 
 """
