@@ -115,6 +115,14 @@ def handle_disconnect():
             break
 
 
+@socketio.on("ping")
+def handle_ping():
+    """Responds to keep-alive pings"""
+    user_id = connected_users[request.sid]
+    room = f"room_{user_id}"
+    print(f"🔄 Received ping from {user_id}")
+    emit("pong", {"message": "Pong!"}, room=room)  # Reply with "pong"
+
 
 @socketio.on("my_event")
 def checkping():
