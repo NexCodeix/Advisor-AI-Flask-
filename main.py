@@ -111,7 +111,8 @@ def handle_disconnect():
         if i == request.sid:
             print("❌ Client disconnected User ID: ", j)
             room = f"room_{j}"
-            socketio.emit("user_disconnected", {"user_id": i}, room=room)
+            # socketio.emit("user_disconnected", {"user_id": j}, room=room)
+            emit("server", {"message": f"User {j} has disconnected", "command": "reconnect", "user_id": j}, broadcast=True)
             break
 
 
