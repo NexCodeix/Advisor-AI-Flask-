@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-*hv2!u39vv703dsd1xin^+0wqyx6&2eec5uvgonpmw)-$&yp_@
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "daphne",
