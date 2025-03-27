@@ -119,7 +119,7 @@ class StabilityAIAdapter(object):
             num_inference_steps=40  # Higher steps for better quality
         ).images[0]
     
-        url = self.upload_to_s3(output_image, f"output_{i+1}.jpeg")
+        url = self.upload_to_s3(output_image, f"output_{i}.jpeg")
         print("URL --> ", url)
         return url 
 
