@@ -53,10 +53,12 @@ class AIConsumer(AsyncWebsocketConsumer):
     async def generate_image(self, event):
         
         for i in range(5):  # Generate 5 images
-            url = await asyncio.get_event_loop().run_in_executor(executor, self.create_ai_image, "Generate an image of truck", None, f"{i}-{self.room_group_name}")
+            # url = await asyncio.get_event_loop().run_in_executor(executor, self.create_ai_image, "Generate an image of truck", None, f"{i}-{self.room_group_name}")
+            url = await self.create_ai_image("Generate an image of truck", None, f"{i}-{self.room_group_name}")
             print(f"Sending {url} to {self.room_group_name}")
 
             await self.send(text_data=json.dumps({"url": url}))
+            await asyncio.sleep(1)
         
     async def create_ai_image(self, prompt, image, i):
         url = await create_ai_image(prompt, image, i)
