@@ -38,3 +38,5 @@ sudo modprobe nvidia
 
 python3 -c "import torch; print(torch.cuda.is_available())"
 
+sudo chown -R ubuntu:ubuntu /home/ubuntu
+chmod -R 755 /home/ubuntu
