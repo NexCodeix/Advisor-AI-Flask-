@@ -2,11 +2,11 @@ import os
 import secrets
 import time
 import boto3
-# import torch
+import torch
 import requests
 from io import BytesIO
 from PIL import Image
-# from diffusers import StableDiffusionXLImg2ImgPipeline, DiffusionPipeline
+from diffusers import StableDiffusionXLImg2ImgPipeline, DiffusionPipeline
 from asgiref.sync import sync_to_async
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
@@ -27,24 +27,24 @@ class StabilityAIAdapter(object):
     emit = None
     sid = None
 
-    # def __init__(self):
-    #     model_id = "stabilityai/stable-diffusion-xl-base-1.0"
-    #     pipe = DiffusionPipeline.from_pretrained(
-    #         model_id, 
-    #         torch_dtype=torch.float16,  # Reduces memory usage
-    #         # low_cpu_mem_usage=True,  # Optimizes RAM
-    #         variant="fp16", 
-    #         use_safetensors=True,
-    #     )
+    def __init__(self):
+        model_id = "stabilityai/stable-diffusion-xl-base-1.0"
+        pipe = DiffusionPipeline.from_pretrained(
+            model_id, 
+            torch_dtype=torch.float16,  # Reduces memory usage
+            # low_cpu_mem_usage=True,  # Optimizes RAM
+            variant="fp16", 
+            use_safetensors=True,
+        )
 
-    #     # Move the model to GPU
-    #     pipe.to("cuda")
-    #     self.pipe = pipe
+        # Move the model to GPU
+        pipe.to("cuda")
+        self.pipe = pipe
 
     def enable_memory_efficiency(self):
         # Enable memory optimizations
-        # self.pipe.enable_xformers_memory_efficient_attention()  # Faster inference, less memory
-        # self.pipe.enable_attention_slicing()  # Reduce VRAM spikes
+        self.pipe.enable_xformers_memory_efficient_attention()  # Faster inference, less memory
+        self.pipe.enable_attention_slicing()  # Reduce VRAM spikes
         print("Fastening Memory Efficiency")
 
     def add_image(self, image_url=None):
@@ -111,27 +111,24 @@ class StabilityAIAdapter(object):
             lst.append(url)
 
     def create_ai_image(self, prompt, image, i):
-        # print("Creating AI Image \n\n")
-        # output_image = self.pipe(
-        #     prompt=prompt, 
-        #     # image=image, 
-        #     strength=self.strength, 
-        #     num_inference_steps=40  # Higher steps for better quality
-        # ).images[0]
+        print("Creating AI Image \n\n")
+        output_image = self.pipe(
+            prompt=prompt, 
+            # image=image, 
+            strength=self.strength, 
+            num_inference_steps=40  # Higher steps for better quality
+        ).images[0]
     
-        # print(f"Saving {i}")
-        # url = self.upload_to_s3(output_image, f"output_{i+1}.jpeg")
-        time.sleep(10)
-        url = f"Image for {i}"
+        url = self.upload_to_s3(output_image, f"output_{i+1}.jpeg")
         print("URL --> ", url)
         return url 
 
 
-adapter = StabilityAIAdapter()
-
 
 @sync_to_async
 def create_ai_image(prompt, image, i):
+    adapter = StabilityAIAdapter()
+    adapter.enable_memory_efficiency()
     url = adapter.create_ai_image(prompt, image, i)
     return url
 

@@ -7,9 +7,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
 from asgiref.sync import sync_to_async, async_to_sync
-from .adapter import StabilityAIAdapter, create_ai_image
-
-adapter = StabilityAIAdapter()
+from .adapter import create_ai_image
 
 class AIConsumer(AsyncWebsocketConsumer):
 
