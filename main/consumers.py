@@ -46,9 +46,10 @@ class AIConsumer(AsyncWebsocketConsumer):
 
         return None
     
-    def handle_generate_image(self, event):
+    async def handle_generate_image(self, event):
         asyncio.create_task(self.generate_image(event))
         print(f"Created Task for {self.room_group_name}")
+        await self.send(text_data=json.dumps({"message": "Started Creating"}))
 
     async def generate_image(self, event):
         
