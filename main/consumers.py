@@ -4,9 +4,12 @@ import threading
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+from concurrent.futures import ThreadPoolExecutor
 from django.contrib.auth import get_user_model
 from asgiref.sync import sync_to_async, async_to_sync
 from .adapter import create_ai_image
+
+executor = ThreadPoolExecutor(max_workers=10)  # Adjust pool size based on system
 
 class AIConsumer(AsyncWebsocketConsumer):
 
@@ -29,7 +32,7 @@ class AIConsumer(AsyncWebsocketConsumer):
         command = text_data_json["command"]
 
         command_type = {
-            "generate_image": self.generate_image
+            "generate_image": self.handle_generate_image
         }
 
         try:
@@ -42,10 +45,15 @@ class AIConsumer(AsyncWebsocketConsumer):
             )
 
         return None
+    
+    def handle_generate_image(self, event):
+        asyncio.create_task(self.generate_image())
+        print(f"Created Task for {self.room_group_name}")
 
     async def generate_image(self, event):
+        
         for i in range(5):  # Generate 5 images
-            url = await self.create_ai_image("Generate an image of truck", None, f"{i}-{self.room_group_name}")
+            url = await asyncio.get_event_loop().run_in_executor(executor, self.create_ai_image, "Generate an image of truck", None, f"{i}-{self.room_group_name}")
             print(f"Sending {url} to {self.room_group_name}")
 
             await self.send(text_data=json.dumps({"url": url}))
