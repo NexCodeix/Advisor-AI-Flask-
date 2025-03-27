@@ -20,12 +20,6 @@ async def websocket_client():
                 response = await websocket.recv()
                 print(f"📩 Received: {response}")
 
-                data = response
-                breakpoint()
-
-                await websocket.close()
-                break
-
     except websockets.ConnectionClosed:
         print("⚠️ Connection closed. Reconnecting in 5 seconds...")
         await asyncio.sleep(5)
