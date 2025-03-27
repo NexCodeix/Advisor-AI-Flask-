@@ -47,7 +47,7 @@ class AIConsumer(AsyncWebsocketConsumer):
         return None
     
     def handle_generate_image(self, event):
-        asyncio.create_task(self.generate_image())
+        asyncio.create_task(self.generate_image(event))
         print(f"Created Task for {self.room_group_name}")
 
     async def generate_image(self, event):
